@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Five horror experts fight for their films. The chair rules. You leave with five to watch.">
+<meta name="theme-color" content="#080605">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Midnight Jury">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Midnight Jury</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IM+Fell+English:ital@0;1&family=Reenie+Beanie&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a tribunal held by candlelight at midnight. One long column like the minutes of a
+   hearing: the petition, the roll call (each juror has a candle that lights while they think),
+   the proceedings, then the verdict as five title cards in viewing order.
+   Ink: bone type on black, oxblood for the jury's marks, tarnished gold only for hairlines and numerals. */
+:root{
+  color-scheme:dark;
+  --void:#080605;      /* the room when the candles are out: black with a brown breath */
+  --soot:#120E0C;      /* a panel on the table */
+  --ash:#1C1613;       /* a raised panel */
+  --bone:#EAE0CC;      /* candlelit type */
+  --bone-2:#B8AB93;    /* secondary type */
+  --bone-3:#857966;    /* faint type */
+  --blood:#A11D1D;     /* oxblood: the jury's one hot ink */
+  --blood-lt:#E25C4E;  /* the same ink, thin, for small type on black */
+  --wax:#C2A266;       /* tarnished gold: hairlines and numerals only */
+  --flame:#FFC46B;
+  --rule:rgba(234,224,204,.13);
+  --rule-wax:rgba(194,162,102,.38);
+  --f-title:"Bodoni Moda","Bodoni 72",Didot,Georgia,serif;
+  --f-book:"IM Fell English","Iowan Old Style",Georgia,serif;
+  --f-type:"Courier Prime","Courier New",ui-monospace,monospace;
+  --f-scrawl:"Reenie Beanie","Bradley Hand","Segoe Print",cursive;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' seed='13' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .92 0 0 0 0 .86 0 0 0 0 .76 3.2 0 0 0 -2.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --s-xs:.78rem; --s-sm:.92rem; --s-md:1.08rem; --s-lg:1.35rem;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--void)}
+body{background:var(--void);color:var(--bone);font-family:var(--f-book);font-size:var(--s-md);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* candle glow from above, a low red pool below, dark corners */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 45% at 50% -8%,rgba(255,196,107,.12),transparent 70%),
+             radial-gradient(ellipse 80% 40% at 50% 110%,rgba(161,29,29,.14),transparent 70%),
+             radial-gradient(ellipse 120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.6))}
+/* projector grain */
+body::after{content:"";position:fixed;inset:-50%;pointer-events:none;z-index:60;background-image:var(--grain);opacity:.085;mix-blend-mode:screen;animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.room{position:relative;z-index:1;max-width:940px;margin:0 auto;padding-inline:clamp(16px,4.5vw,44px);padding-block:30px 80px;display:grid;gap:72px}
+.room>*,.proc>*,.round>*,.verdict-head>*,.how>*{min-width:0}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blood-lt);outline-offset:3px}
+.eyebrow{font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.22em;text-transform:uppercase;color:var(--bone-3)}
+.sec-h{font-family:var(--f-title);font-style:italic;font-weight:500;font-size:clamp(2.3rem,7vw,3.6rem);line-height:.98;letter-spacing:-.01em}
+.sec-h em{font-style:normal;font-weight:400;font-size:.42em;letter-spacing:.22em;text-transform:uppercase;color:var(--blood-lt);display:block;margin-top:.7em;line-height:1.3}
+.sec-head{display:grid;gap:10px;margin-bottom:26px}
+.sec-head .lede{color:var(--bone-2);font-style:italic;max-width:58ch}
+
+/* ---------- masthead ---------- */
+.mast{display:grid;gap:18px;padding-top:6px}
+.docket{display:flex;flex-wrap:wrap;gap:6px 22px}
+.docket b{color:var(--wax);font-weight:400}
+.title{font-family:var(--f-title);line-height:.8;position:relative;animation:flicker 7s infinite}
+.title .t1{display:block;font-style:italic;font-weight:900;font-size:clamp(4.4rem,17vw,11rem);letter-spacing:-.035em;color:var(--bone)}
+.title .t2{display:block;font-weight:400;font-size:clamp(1.5rem,5.6vw,3.4rem);letter-spacing:.62em;text-transform:uppercase;color:var(--blood-lt);margin:.28em 0 0 .18em}
+@keyframes flicker{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.82}43%{opacity:1}44.5%{opacity:.9}45%{opacity:1}77%{opacity:1}77.6%{opacity:.86}78%{opacity:1}}
+.thesis{font-style:italic;font-size:clamp(1.2rem,2.7vw,1.5rem);line-height:1.4;max-width:36ch;color:var(--bone-2)}
+.thesis b{font-weight:400;color:var(--bone)}
+
+/* ---------- the petition ---------- */
+.petition{display:grid;gap:22px;padding:28px clamp(16px,4vw,36px) 30px;background:linear-gradient(180deg,rgba(28,22,19,.85),rgba(18,14,12,.85));border:1px solid var(--rule);position:relative}
+.petition::before{content:"";position:absolute;inset:6px;border:1px solid var(--rule-wax);pointer-events:none;opacity:.55}
+.petition>*{position:relative}
+.crave{font-family:var(--f-title);font-style:italic;font-size:clamp(1.5rem,4.4vw,2.1rem);line-height:1.1;color:var(--bone-2)}
+#mood{width:100%;min-height:2.6em;resize:vertical;border:0;border-bottom:1px solid var(--blood);background:transparent;color:var(--bone);font-family:var(--f-title);font-style:italic;font-weight:500;font-size:clamp(1.7rem,5.4vw,2.6rem);line-height:1.15;padding:4px 2px 8px}
+#mood::placeholder{color:rgba(234,224,204,.26)}
+#mood:focus-visible{outline:none;border-bottom-color:var(--blood-lt);box-shadow:0 10px 24px -18px var(--blood-lt)}
+.whisper{font-style:italic;color:var(--bone-3);font-size:var(--s-sm);line-height:1.9}
+.whisper button{background:none;border:0;padding:0;cursor:pointer;color:var(--bone-2);font-family:var(--f-title);font-style:italic;text-decoration:underline;text-decoration-color:rgba(226,92,78,.45);text-underline-offset:3px}
+.whisper button:hover{color:var(--bone);text-decoration-color:var(--blood-lt)}
+.whisper .dot{margin:0 .45em;color:var(--bone-3)}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px 34px}
+fieldset{border:0;margin:0;padding:0;min-width:0;display:grid;gap:6px}
+legend{padding:0;margin-bottom:6px;font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.2em;text-transform:uppercase;color:var(--bone-3)}
+.words{display:flex;flex-wrap:wrap;gap:4px 16px}
+.words label{position:relative;cursor:pointer}
+.words input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.words span{font-family:var(--f-title);font-style:italic;font-size:1.2rem;color:var(--bone-3);border-bottom:1px solid transparent;padding-bottom:1px;transition:color .2s}
+.words label:hover span{color:var(--bone-2)}
+.words input:checked+span{color:var(--bone);border-bottom-color:var(--blood-lt)}
+.words input:focus-visible+span{outline:2px solid var(--blood-lt);outline-offset:3px}
+details.endured summary{cursor:pointer;font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.2em;text-transform:uppercase;color:var(--bone-3);list-style:none}
+details.endured summary::-webkit-details-marker{display:none}
+details.endured summary::before{content:"+ ";color:var(--blood-lt)}
+details.endured[open] summary::before{content:"− "}
+details.endured[open] summary{margin-bottom:10px}
+.endured-note{display:block;font-style:italic;font-size:var(--s-sm);color:var(--bone-3);margin-bottom:8px}
+#skip{width:100%;min-height:6.5em;border:1px solid var(--rule);background:rgba(0,0,0,.35);padding:10px 12px;font-family:var(--f-type);font-size:var(--s-sm);color:var(--bone)}
+.summon{display:flex;flex-wrap:wrap;align-items:center;gap:18px 26px;padding-top:6px}
+.seal{width:138px;height:138px;flex:none;border:0;cursor:pointer;display:grid;place-content:center;gap:2px;text-align:center;color:var(--bone);
+  border-radius:47% 53% 51% 49% / 53% 47% 53% 47%;
+  background:radial-gradient(circle at 34% 28%,#D2443A 0,#A11D1D 38%,#6E1010 72%,#3E0808 100%);
+  box-shadow:inset 0 0 0 7px rgba(0,0,0,.18),inset 0 0 0 8px rgba(255,200,170,.18),inset 0 -10px 18px rgba(0,0,0,.35),0 14px 30px -12px rgba(161,29,29,.75),0 0 0 1px rgba(0,0,0,.6);
+  transition:transform .15s ease}
+.seal b{font-family:var(--f-title);font-style:italic;font-weight:600;font-size:1.55rem;line-height:1;letter-spacing:-.01em}
+.seal small{font-family:var(--f-type);font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;opacity:.85}
+.seal:hover{transform:rotate(-4deg) scale(1.03)}
+.seal:active{transform:scale(.97)}
+.seal:disabled{cursor:progress;filter:saturate(.6) brightness(.8);transform:none}
+.seal:disabled b{font-size:1.2rem}
+.stop{background:none;border:1px solid var(--rule);color:var(--bone-2);font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.18em;text-transform:uppercase;padding:9px 14px;cursor:pointer}
+.stop:hover{border-color:var(--blood-lt);color:var(--bone)}
+.cost-line{font-style:italic;color:var(--bone-3);font-size:var(--s-sm);max-width:32ch}
+.status{font-family:var(--f-type);font-size:var(--s-sm);color:var(--blood-lt);min-height:1.2em}
+.status:empty{display:none}
+
+/* ---------- roll call ---------- */
+.roll{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.roll li{display:grid;grid-template-columns:3.2rem minmax(0,1fr) auto;gap:4px 18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--rule)}
+.roll .rn{font-family:var(--f-title);font-size:1.7rem;color:var(--wax);line-height:1;text-align:center}
+.roll .who{display:grid;gap:2px}
+.roll .nm{font-family:var(--f-title);font-style:italic;font-size:var(--s-lg);line-height:1.15}
+.roll .rl{font-family:var(--f-type);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blood-lt)}
+.roll .ts{font-style:italic;font-size:var(--s-sm);color:var(--bone-3);line-height:1.4}
+.roll li.presiding .rn{color:var(--blood-lt);font-size:1.05rem;font-style:italic}
+.roll li.presiding .nm{font-size:1.5rem}
+.vigil{display:grid;justify-items:center;gap:6px;width:5.6rem}
+.vigil .st{font-family:var(--f-type);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--bone-3);text-align:center;line-height:1.2}
+.candle{position:relative;width:10px;height:30px;margin-top:16px;border-radius:2px 2px 1px 1px;background:linear-gradient(90deg,#BFB39D,#EDE4D2 45%,#A89C86)}
+.candle::before{content:"";position:absolute;left:50%;top:-5px;width:1.5px;height:6px;background:#2A221D;transform:translateX(-50%)}
+.candle::after{content:"";position:absolute;left:50%;bottom:100%;width:10px;height:18px;margin-bottom:3px;transform:translateX(-50%) scale(0);transform-origin:50% 100%;border-radius:50% 50% 45% 45% / 62% 62% 38% 38%;
+  background:radial-gradient(ellipse at 50% 72%,#FFF6DC 0 18%,var(--flame) 40%,#E0662C 72%,rgba(161,29,29,0) 100%);transition:transform .35s ease}
+.vigil[data-s="thinking"] .candle::after{transform:translateX(-50%) scale(1);box-shadow:0 0 18px 6px rgba(255,196,107,.28);animation:burn .9s ease-in-out infinite alternate}
+.vigil[data-s="done"] .candle::after{transform:translateX(-50%) scale(.82);box-shadow:0 0 12px 3px rgba(255,196,107,.18)}
+.vigil[data-s="absent"] .candle{opacity:.35}
+.vigil[data-s="absent"] .st{color:var(--blood-lt)}
+.vigil[data-s="thinking"] .st,.vigil[data-s="done"] .st{color:var(--bone-2)}
+@keyframes burn{0%{transform:translateX(-50%) scale(1,1) rotate(-2deg)}50%{transform:translateX(-52%) scale(.92,1.1) rotate(2deg)}100%{transform:translateX(-48%) scale(1.04,.94) rotate(-1deg)}}
+@media (max-width:520px){.roll li{grid-template-columns:2.2rem minmax(0,1fr) auto;gap:4px 12px}.vigil{width:4.4rem}.roll .ts{display:none}}
+
+/* ---------- the proceedings ---------- */
+.proc{display:grid}
+.round{display:grid;gap:18px}
+.round+.round{margin-top:56px}
+.round-h{display:grid;gap:4px;border-top:1px solid var(--rule-wax);padding-top:14px}
+.round-h h3{font-family:var(--f-title);font-style:italic;font-size:1.9rem;line-height:1.05}
+.round-h h3 span{font-style:normal;font-size:.7em;color:var(--wax);margin-right:.5em}
+.round-h p{font-family:var(--f-type);font-size:var(--s-xs);color:var(--bone-3);letter-spacing:.04em}
+.testimony{background:var(--soot);border:1px solid var(--rule);padding:20px clamp(14px,3vw,26px) 22px;display:grid;gap:14px}
+.t-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;border-bottom:1px solid var(--rule);padding-bottom:10px}
+.t-head .sn{font-family:var(--f-title);color:var(--wax);font-size:1.3rem}
+.t-head .who{font-family:var(--f-title);font-style:italic;font-size:1.45rem;line-height:1.1}
+.t-head .what{font-family:var(--f-type);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blood-lt)}
+.reading{font-style:italic;font-size:var(--s-md);color:var(--bone-2);max-width:68ch}
+.reading::before{content:"Reads the petition as: ";font-style:normal;font-family:var(--f-type);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--bone-3)}
+.noms{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px 26px;padding-top:8px}
+.nom{display:grid;gap:6px;align-content:start;position:relative;min-width:0}
+.nom .t{font-family:var(--f-title);font-style:italic;font-weight:600;font-size:1.45rem;line-height:1.08;overflow-wrap:anywhere}
+.nom .meta{font-family:var(--f-type);font-size:var(--s-xs);color:var(--bone-3)}
+.nom .pitch{font-size:var(--s-sm);line-height:1.5}
+.kv{font-family:var(--f-type);font-size:var(--s-xs);line-height:1.5;color:var(--bone-2)}
+.kv b{font-weight:400;letter-spacing:.14em;text-transform:uppercase;font-size:.68rem;color:var(--bone-3);margin-right:.4em}
+.nom.hill .t{text-decoration:underline;text-decoration-color:var(--blood);text-decoration-thickness:2px;text-underline-offset:5px;text-decoration-skip-ink:none}
+.hill-mark{position:absolute;right:0;top:-20px;font-family:var(--f-scrawl);font-size:1.45rem;line-height:1;color:var(--blood-lt);transform:rotate(-5deg)}
+.pending{font-family:var(--f-type);font-size:var(--s-sm);color:var(--bone-3);font-style:italic}
+.absent-note{font-family:var(--f-type);font-size:var(--s-sm);color:var(--blood-lt);padding:6px 0}
+.dropped{font-family:var(--f-type);font-size:var(--s-xs);color:var(--bone-3)}
+.transcript{border-left:1px solid var(--rule-wax);padding-left:clamp(12px,3vw,24px);font-family:var(--f-type)}
+.turn{display:grid;gap:8px;padding:16px 0;border-bottom:1px dashed var(--rule)}
+.turn:last-child{border-bottom:0}
+.turn .spk{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blood-lt)}
+.turn .spk small{color:var(--bone-3);letter-spacing:.1em;margin-left:.6em;font-size:inherit}
+.turn .line{font-family:var(--f-book);font-style:italic;font-size:var(--s-lg);line-height:1.35;color:var(--bone);max-width:62ch}
+.turn .move{font-size:var(--s-sm);line-height:1.55;color:var(--bone-2);max-width:72ch}
+.turn .move b{font-weight:400;color:var(--bone-3);text-transform:uppercase;letter-spacing:.14em;font-size:.68rem;margin-right:.5em}
+.turn .move em{font-style:normal;color:var(--bone)}
+.chair-says{border-left:2px solid var(--blood);padding:6px 0 6px clamp(14px,3vw,24px);display:grid;gap:8px}
+.chair-says p:last-child{font-style:italic;font-size:var(--s-lg);line-height:1.4;max-width:60ch}
+
+/* ---------- the verdict ---------- */
+.verdict-head{position:relative;display:grid;gap:12px;margin-bottom:30px}
+.flag{justify-self:start;font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.06em;color:var(--bone);border:1px dashed var(--blood-lt);padding:5px 10px}
+.for{font-style:italic;font-size:var(--s-lg);color:var(--bone-2);max-width:44ch}
+.for q{color:var(--bone);quotes:"\201C" "\201D"}
+.stamp{position:absolute;right:4px;top:4px;font-family:var(--f-title);font-weight:700;font-size:clamp(1.1rem,3vw,1.5rem);letter-spacing:.24em;text-transform:uppercase;color:var(--blood-lt);border:2px solid var(--blood-lt);padding:8px 10px 6px 14px;transform:rotate(-11deg);opacity:.85;
+  -webkit-mask-image:var(--grain);mask-image:var(--grain);-webkit-mask-size:120px;mask-size:120px}
+.stamp.slam{animation:slam .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes slam{from{transform:rotate(-11deg) scale(2.4);opacity:0}to{transform:rotate(-11deg) scale(1);opacity:.85}}
+.statement{color:var(--bone-2);max-width:64ch;font-size:var(--s-md)}
+.cards{list-style:none;margin:0;padding:0;display:grid;gap:22px}
+.card{position:relative;background:linear-gradient(180deg,#140F0D,#0C0908);border:1px solid var(--rule);padding:8px}
+.card .frame{border:1px solid var(--rule-wax);outline:1px solid rgba(194,162,102,.16);outline-offset:-5px;padding:26px clamp(16px,4vw,40px);display:grid;gap:12px;position:relative}
+.card .num{font-family:var(--f-title);color:var(--wax);font-size:1.15rem;letter-spacing:.3em}
+.card .ttl{font-family:var(--f-title);font-style:italic;font-weight:700;font-size:clamp(2.2rem,7.5vw,3.8rem);line-height:.98;letter-spacing:-.02em;overflow-wrap:anywhere}
+.card .credit{font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.2em;text-transform:uppercase;color:var(--bone-3)}
+.card .credit b{font-weight:400;color:var(--bone)}
+.champ{font-family:var(--f-scrawl);font-size:1.55rem;line-height:1.1;color:var(--blood-lt);transform:rotate(-1.2deg);transform-origin:left}
+.card .why{font-size:var(--s-md);max-width:64ch}
+.notes{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 28px}
+.notes div{display:grid;gap:2px}
+.notes dt{font-family:var(--f-type);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-3)}
+.notes dd{margin:0;font-style:italic;color:var(--bone-2);font-size:var(--s-sm)}
+.links{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding-top:6px;font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.08em}
+.links a,.links button{color:var(--bone-2);text-decoration:none;border:0;border-bottom:1px solid var(--rule-wax);padding:3px 0;background:none;cursor:pointer;font:inherit;letter-spacing:inherit}
+.links a:hover,.links button:hover{color:var(--bone);border-bottom-color:var(--blood-lt)}
+.links button[aria-pressed="true"]{color:var(--blood-lt);border-bottom-color:var(--blood-lt)}
+.order-note{font-style:italic;color:var(--bone-3);max-width:68ch;margin-top:22px}
+.after{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:34px;margin-top:44px}
+.after h3{font-family:var(--f-title);font-style:italic;font-size:1.7rem;line-height:1.05;margin-bottom:14px}
+.struck{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.struck li{display:grid;gap:3px}
+.struck .st{font-family:var(--f-title);font-style:italic;font-size:1.3rem;line-height:1.1;color:var(--bone-3);position:relative;justify-self:start}
+.struck .st::after{content:"";position:absolute;left:-6px;right:-8px;top:55%;height:2px;background:var(--blood-lt);transform:rotate(-3deg);border-radius:2px}
+.struck .by{font-family:var(--f-type);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blood-lt)}
+.struck .rs{font-size:var(--s-sm);color:var(--bone-2);font-style:italic}
+.dissent{border:1px solid var(--rule);background:var(--soot);padding:18px 20px;display:grid;gap:8px}
+.dissent .who{font-family:var(--f-type);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--blood-lt)}
+.dissent .film{font-family:var(--f-title);font-style:italic;font-size:1.5rem;line-height:1.1}
+.dissent blockquote{margin:0;font-style:italic;color:var(--bone-2)}
+.dissent .src{font-family:var(--f-type);font-size:.7rem;color:var(--bone-3)}
+
+/* ---------- archive ---------- */
+.archive{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.archive button{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:14px 0;cursor:pointer;display:grid;gap:4px}
+.archive button:hover .am{color:var(--blood-lt)}
+.archive .am{font-family:var(--f-title);font-style:italic;font-size:var(--s-lg);transition:color .2s}
+.archive .ad{font-family:var(--f-type);font-size:var(--s-xs);color:var(--bone-3)}
+.empty{font-style:italic;color:var(--bone-3);padding-top:14px}
+
+/* ---------- how the jury sits ---------- */
+.how{display:grid;gap:28px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+.steps li{display:grid;gap:8px;align-content:start;border-top:1px solid var(--rule-wax);padding-top:12px}
+.steps b{font-family:var(--f-title);font-style:italic;font-weight:500;font-size:1.4rem;line-height:1.1}
+.steps b span{font-style:normal;color:var(--wax);font-size:.8em;margin-right:.45em}
+.steps p{font-size:var(--s-sm);color:var(--bone-2)}
+.tenets{margin:0;padding:0;list-style:none;display:grid;gap:10px;max-width:70ch}
+.tenets li{font-size:var(--s-sm);color:var(--bone-2);padding-left:1.4em;position:relative}
+.tenets li::before{content:"†";position:absolute;left:0;color:var(--blood-lt)}
+.tenets b{font-weight:400;color:var(--bone);font-style:italic}
+.summons-tools{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.summons-tools label{font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--bone-3)}
+.pick{background:var(--soot);border:1px solid var(--rule);padding:8px 10px;font-family:var(--f-type);font-size:var(--s-sm);color:var(--bone);max-width:100%}
+.ghost{background:none;border:1px solid var(--rule);padding:7px 12px;font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.14em;text-transform:uppercase;color:var(--bone-2);cursor:pointer}
+.ghost:hover{border-color:var(--blood-lt);color:var(--bone)}
+.summons-box{max-height:420px;overflow:auto;background:rgba(0,0,0,.45);border:1px solid var(--rule)}
+#summonsText{margin:0;padding:16px 18px;font-family:var(--f-type);font-size:.8rem;line-height:1.6;white-space:pre-wrap;color:var(--bone-2)}
+
+/* ---------- projection room ---------- */
+.projection{background:var(--soot);border:1px solid var(--rule-wax);padding:22px clamp(16px,4vw,30px);display:grid;gap:16px}
+.projection h2{font-family:var(--f-title);font-style:italic;font-size:1.8rem;line-height:1.05}
+.projection p{font-size:var(--s-sm);color:var(--bone-2);max-width:62ch}
+.proj-state{font-family:var(--f-type);font-size:var(--s-xs);letter-spacing:.08em;color:var(--bone)}
+.proj-state:empty{display:none}
+#keyArea{display:grid;gap:14px}
+.key-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.key-row .eyebrow{flex-basis:100%}
+#keyInput{flex:1 1 240px;min-width:0;background:rgba(0,0,0,.45);border:1px solid var(--rule);padding:9px 11px;font-family:var(--f-type);font-size:var(--s-sm);color:var(--bone)}
+.proj-msg{font-family:var(--f-type);font-size:var(--s-xs);color:var(--blood-lt)}
+.proj-msg:empty{display:none}
+
+footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;font-family:var(--f-type);font-size:var(--s-xs);color:var(--bone-3)}
+footer p{max-width:62ch}
+footer .ghost{align-self:start}
+
+@media (max-width:560px){
+  .stamp{position:static;justify-self:start;transform:rotate(-6deg);margin-top:4px}
+  .stamp.slam{animation:none}
+  .seal{width:120px;height:120px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="room">
+
+  <header class="mast">
+    <p class="docket eyebrow"><span>Hearing <b id="docketNo">No. 001</b></span><span>Sits at midnight</span><span>Horror only</span></p>
+    <h1 class="title"><span class="t1">Midnight</span><span class="t2">Jury</span></h1>
+    <p class="thesis">Tell the jury what you crave. <b>Five experts</b> each fight for their own films, <b>the chair</b> rules, and you leave with five to watch, in order.</p>
+  </header>
+
+  <section class="petition" aria-labelledby="petH">
+    <p class="eyebrow" id="petH">The petition</p>
+    <label class="crave" for="mood">Tonight I crave</label>
+    <textarea id="mood" rows="2" placeholder="90s teenage horror" autocomplete="off"></textarea>
+    <p class="whisper" id="whisper"></p>
+
+    <div class="terms">
+      <fieldset>
+        <legend>My nerves can take</legend>
+        <div class="words">
+          <label><input type="radio" name="intensity" id="int-any" value="any" checked><span>anything</span></label>
+          <label><input type="radio" name="intensity" id="int-gentle" value="gentle"><span>gentle dread</span></label>
+          <label><input type="radio" name="intensity" id="int-unsettling" value="unsettling"><span>unsettling</span></label>
+          <label><input type="radio" name="intensity" id="int-brutal" value="brutal"><span>brutal</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>The hearing</legend>
+        <div class="words">
+          <label><input type="radio" name="mode" id="mode-full" value="full" checked><span>full, with cross-examination</span></label>
+          <label><input type="radio" name="mode" id="mode-short" value="short"><span>swift</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <details class="endured" id="skipBox">
+      <summary>Films I have already endured <span id="skipCount"></span></summary>
+      <label class="endured-note" for="skip">One per line. The jury will never pick these. "Seen it" on a verdict card adds a film here.</label>
+      <textarea id="skip" placeholder="Scream (1996)&#10;The Ring"></textarea>
+    </details>
+
+    <div class="summon">
+      <button class="seal" id="convene" type="button"><b>Summon</b><small>the jury</small></button>
+      <button class="stop" id="stop" type="button" hidden>Adjourn</button>
+      <p class="cost-line" id="cost"></p>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section aria-labelledby="rollH">
+    <div class="sec-head">
+      <p class="eyebrow">Roll call</p>
+      <h2 class="sec-h" id="rollH">The jury</h2>
+      <p class="lede">Five experts with different trades and different appetites, so they disagree for real reasons. Each fights for their own films. The chair has none to push. A candle burns while a juror deliberates.</p>
+    </div>
+    <ol class="roll" id="seats"></ol>
+  </section>
+
+  <section id="record" aria-labelledby="recordH" hidden>
+    <div class="sec-head">
+      <p class="eyebrow" id="recordFor">The proceedings</p>
+      <h2 class="sec-h" id="recordH">The proceedings</h2>
+    </div>
+    <div class="proc">
+      <div class="round" id="r1">
+        <div class="round-h"><h3><span>I</span>Sealed testimony</h3><p>Each juror chose three films alone, without hearing the others.</p></div>
+        <div id="pitches" class="round"></div>
+      </div>
+      <div class="round" id="r2">
+        <div class="round-h"><h3><span>II</span>Cross-examination</h3><p>Each juror read every testimony, then attacked one film, defended their own and conceded one.</p></div>
+        <div id="cross"></div>
+      </div>
+      <div class="round" id="r3">
+        <div class="round-h"><h3><span>III</span>The chair</h3><p>The chair weighed the whole record against the jury's written rules.</p></div>
+        <div id="chairBox"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="programmeSec" aria-labelledby="progH">
+    <div class="verdict-head">
+      <p class="flag" id="exampleFlag">A sample verdict, prepared in advance. Summon the jury for your own.</p>
+      <p class="eyebrow">The verdict</p>
+      <h2 class="sec-h" id="progH">Five films<em>in the order they must be watched</em></h2>
+      <p class="for">For <q id="progMood">90s teenage horror</q></p>
+      <span class="stamp" id="stamp" aria-hidden="true">So ruled</span>
+      <p class="statement" id="statement"></p>
+    </div>
+    <ol class="cards" id="programme"></ol>
+    <p class="order-note" id="orderNote"></p>
+    <div class="after">
+      <div id="struckBox"><h3>Struck from the record</h3><ul class="struck" id="struck"></ul></div>
+      <div id="dissentBox"><h3>Dissent</h3><div id="dissent"></div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="archH">
+    <div class="sec-head">
+      <p class="eyebrow">Kept on this device</p>
+      <h2 class="sec-h" id="archH">Past verdicts</h2>
+    </div>
+    <ul class="archive" id="archive"></ul>
+  </section>
+
+  <section class="how" aria-labelledby="howH">
+    <div class="sec-head">
+      <p class="eyebrow">The rules of the house</p>
+      <h2 class="sec-h" id="howH">How the jury sits</h2>
+    </div>
+    <ol class="steps">
+      <li><b><span>I</span>Sealed testimony</b><p>Each juror reads your petition through their own trade and chooses three films alone, sealed off from the others. Every case must point to a scene or a choice the filmmaker made.</p></li>
+      <li><b><span>II</span>Cross-examination</b><p>Each juror reads every testimony, attacks the weakest rival film, defends their own favourite, concedes one rival film and corrects any wrong facts. Full hearings only.</p></li>
+      <li><b><span>III</span>The verdict</b><p>The chair weighs truth, fit, evidence and range, in that order, picks five films and sets the order you watch them in.</p></li>
+    </ol>
+    <ul class="tenets">
+      <li><b>Alone first.</b> Jurors who heard each other first would agree too early. Sealed testimony keeps their appetites apart.</li>
+      <li><b>Evidence, not adjectives.</b> "Atmospheric" proves nothing. A held shot, a sound, a cut does.</li>
+      <li><b>A chair with written rules.</b> The loudest juror doesn't win by being loud.</li>
+      <li><b>A guard on facts.</b> A wrong year or director gets a film thrown out, and the jurors check each other. Still check a film before you hunt it down.</li>
+    </ul>
+    <div id="summonsWrap" hidden style="display:grid;gap:12px">
+      <div class="summons-tools">
+        <label for="summonsPick">Read the summons</label>
+        <select class="pick" id="summonsPick"></select>
+        <button class="ghost" type="button" id="copySummons">Copy</button>
+      </div>
+      <div class="summons-box"><pre id="summonsText"></pre></div>
+    </div>
+  </section>
+
+  <section class="projection" id="projection" aria-labelledby="projH" hidden>
+    <p class="eyebrow">Behind the screen</p>
+    <h2 id="projH">The projection room</h2>
+    <p class="proj-state" id="projState"></p>
+    <div id="keyArea">
+      <p>Paste your key once. It stays in this browser, on this device, and goes only to the service that runs the hearings. Each hearing is billed to the key's own account, separately from any subscription. Set a monthly spending limit in that account, and delete the key there if this device is lost. Anyone using this browser can run hearings on it, and so can any other page published at this same web address.</p>
+      <div class="key-row">
+        <label class="eyebrow" for="keyInput">Projection key</label>
+        <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="Paste the key here">
+        <button class="ghost" type="button" id="saveKey">Set key</button>
+        <button class="ghost" type="button" id="forgetKey">Forget key</button>
+      </div>
+      <fieldset>
+        <legend>The jurors' standard</legend>
+        <div class="words">
+          <label><input type="radio" name="quality" id="q-finest" value="finest" checked><span>finest</span></label>
+          <label><input type="radio" name="quality" id="q-thrifty" value="thrifty"><span>half price</span></label>
+        </div>
+      </fieldset>
+      <p class="proj-state" id="lastCost"></p>
+    </div>
+    <p class="proj-msg" id="projMsg" role="status" aria-live="polite"></p>
+  </section>
+
+  <footer>
+    <p>The jurors and the chair are fictional. They can misremember a film: check each one on Letterboxd before you hunt it down.</p>
+    <button class="ghost" type="button" id="openProjection">Projection room</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   THE PANEL
+   Five jurors chosen so their disagreements are about real
+   things: discovery vs. craft vs. history vs. canon vs. crowd.
+   ============================================================ */
+const JURY = [
+  { id:"programmer", seat:"I", name:"Ines Varga", role:"festival programmer",
+    short:"Discoveries, and films that play to a full room.",
+    bio:"For fifteen years you have run the midnight section of a major international genre festival. You watch six hundred submissions a year and pick twelve. Directors you premiered now make studio films. You judge a film by what it does to a full room at one in the morning.",
+    taste:"Discoveries and international genre cinema; films with a pulse; the title people will be quoting in five years; films that turn a room of strangers into one audience.",
+    hates:"Prestige horror that is embarrassed to be horror. A trailer stretched to ninety minutes. Lists that stop at the films everyone already owns.",
+    voice:"Fast, evangelical, concrete. You describe how a film plays to a late-night room: the gasp, the laugh, the silence. You never claim a specific screening, reaction or festival result unless you are certain of it." },
+  { id:"critic", seat:"II", name:"Margit Holm", role:"film critic",
+    short:"Formal craft, and films that hold up on a third viewing.",
+    bio:"You have reviewed films for thirty years, for a national daily and a serious film monthly, and you wrote the book on horror's formal craft that other critics still borrow from. You have seen nearly everything that matters in the genre, most of it more than once.",
+    taste:"Formal achievement: framing, editing, sound and performance working as one. Films that hold up on a third viewing. You will defend a famous film when it is famous for the right reasons.",
+    hates:"Hype. Nostalgia passed off as quality. \"Elevated horror\" as a marketing phrase. Praise that cannot point to a shot.",
+    voice:"Precise, dry, unhurried, sometimes devastating. You argue from a specific shot or cut and expect the others to do the same." },
+  { id:"director", seat:"III", name:"Sam Okafor", role:"horror director",
+    short:"How a scare is built: sound, blocking, what stays off-screen.",
+    bio:"You have directed three horror features; your second broke out of a midnight slot and sold around the world. You storyboard every scare and you know what each one cost to shoot. You watch other people's films the way a magician watches another magician.",
+    taste:"Craft you can steal: sound design, blocking, negative space in the frame, how long a shot is held, practical effects. Films that taught you something you then used on set.",
+    hates:"Jump scares bought with volume. Weightless digital monsters. Scripts that stop to explain the monster.",
+    voice:"You talk in shots and cuts. Generous to anyone who took a real risk, merciless to laziness." },
+  { id:"archivist", seat:"IV", name:"Yuki Tanabe", role:"archivist and repertory programmer",
+    short:"Overlooked, regional and foreign-language horror, brought back.",
+    bio:"You programme the repertory screens of a cinematheque and curate releases for a small restoration label. You have handled original negatives, tracked rights through bankrupt distributors and brought films back from a single surviving print.",
+    taste:"The overlooked, the regional and the non-English; the film a bad video release buried that deserves a second life; the forgotten influence behind a famous title. Everything you pick can be watched today, restored, on disc or streaming.",
+    hates:"Canon worship. Lists that are only Hollywood. Calling a film \"obscure\" when nobody bothered to look for it.",
+    voice:"Patient, a storyteller. You tell how a film was made, lost and brought back only when you are certain of it; otherwise you talk about what is on screen." },
+  { id:"scholar", seat:"V", name:"Dr. Amara Quist", role:"horror scholar",
+    short:"What frightened people when, and why a wave of films happened.",
+    bio:"You are a professor of film studies and have written two books on horror and its eras: what frightened people when, and why. Your lectures on teen horror, folk horror and body horror are the ones students record.",
+    taste:"Films that capture the fears of their moment: about bodies, class, gender, faith, technology. To you a mood is a cultural phenomenon; you know why a cycle of films happened, and you pick the films that explain it.",
+    hates:"Treating horror as mere entertainment. Just as much, dressing a weak film in theory to make it sound important.",
+    voice:"Sharp and plain-spoken. You connect each film to its history in a sentence, without jargon." }
+];
+const CHAIR = { id:"chair", seat:"Chair", name:"Odile Brenner", role:"chair of the jury",
+  short:"Rules for you, not for the jurors. Picks the five and their order.",
+  bio:"For twenty years you directed one of the oldest genre film festivals, and you have presided over juries on three continents. You are known for rulings that serve the brief rather than anyone's reputation, and for explaining every decision in plain words." };
+
+const INTENSITY = {
+  any:"No preference: match the mood.",
+  gentle:"Gentle: dread and atmosphere over gore. Nothing gruelling.",
+  unsettling:"Unsettling: the viewer wants to be disturbed, not punished.",
+  brutal:"Brutal: a strong stomach. Extreme films are welcome."
+};
+const MOODS = ["90s teenage horror","folk horror for a foggy Sunday","slow dread, no jump scares","body horror that's secretly a love story","an Italian 70s fever dream","scary enough for friends who never watch horror"];
+
+/* ============================================================
+   THE SUMMONS (what each juror and the chair are told)
+   Every summons stands alone: it carries everything needed.
+   ============================================================ */
+function briefBlock(b){
+  return [
+    "THE VIEWER'S BRIEF",
+    "Mood: \"" + b.mood + "\"",
+    "Intensity: " + INTENSITY[b.intensity],
+    "Already seen or not wanted (never pick these): " + (b.skip.length ? b.skip.join("; ") : "none given"),
+    "The viewer lives in the Netherlands and watches at home."
+  ].join("\n");
+}
+function whoBlock(j){
+  return [
+    "WHO YOU ARE",
+    j.bio,
+    "Your taste: " + j.taste,
+    "What you can't stand: " + j.hates,
+    "How you talk: " + j.voice
+  ].join("\n");
+}
+function opening(j){
+  return "You are " + j.name + ", " + j.role + ", one of five experts on the Midnight Jury. The jury argues over which films one viewer should watch. A chair hears every case, picks five films, and announces who championed each film that made it and whose films were thrown out. Your reputation rides on that.";
+}
+
+function pitchPrompt(j, b){
+  return [
+    opening(j), "", briefBlock(b), "", whoBlock(j), "",
+    "ROUND ONE: YOUR OPENING PITCH",
+    "You work alone. You do not know what the other four will pitch, and they do not know yours. Nominate the three films you believe this viewer should see, in order of conviction. Pitch your own judgment, not a safe consensus: choose an obvious title only if you can say why the obvious answer is still the right one here.",
+    "",
+    "First, read the brief as only someone with your job could. A mood is a feeling, not only a genre tag. Say in one sentence what this viewer is really after.",
+    "",
+    "Rules for every film:",
+    "- A real, released feature film you are certain exists. Give the title it is best known by in English (or its original title if it has no English one), the year of first release, the director and the country, exactly. If you are unsure of any of these, choose a different film. One wrong fact gets your whole pitch thrown out.",
+    "- Watchable today at home: no lost films, no festival-only titles.",
+    "- It fits the brief on the brief's own terms. A film you love that only half fits belongs on another night.",
+    "- Not on the viewer's skip list.",
+    "- At least one of your three is a film a well-read horror fan may not have seen.",
+    "- Argue from the film itself: a scene, a shot, a sound, a performance, a decision by the filmmaker. Words like \"atmospheric\", \"iconic\" or \"a must-see\" do not count unless you say what produces the effect.",
+    "- No spoilers: no twists, no endings, no deaths the film keeps hidden.",
+    "- Say only what you are sure is true. Do not invent festival premieres, audience reactions, awards, box-office figures, production stories or restoration histories. If you are not certain of such a detail, leave it out and argue from what is on screen.",
+    "",
+    "Reply with only this JSON, no other text:",
+    "{",
+    "  \"reading\": \"one sentence: what this viewer is really after\",",
+    "  \"nominations\": [",
+    "    {",
+    "      \"title\": \"Film title\",",
+    "      \"year\": 1998,",
+    "      \"director\": \"Full name\",",
+    "      \"country\": \"Country\",",
+    "      \"pitch\": \"two or three sentences in your own voice: why this film, for this brief\",",
+    "      \"moment\": \"one specific, spoiler-free scene or detail that proves your case\",",
+    "      \"risk\": \"the honest case against it, in one sentence\"",
+    "    }",
+    "  ],",
+    "  \"hill\": \"the title of the one nomination you will fight hardest for\"",
+    "}",
+    "Exactly three nominations."
+  ].join("\n");
+}
+
+function crossPrompt(j, b, dossier, hill){
+  return [
+    opening(j), "", briefBlock(b), "", whoBlock(j), "",
+    "ROUND TWO: CROSS-EXAMINATION",
+    "These are the opening pitches of every juror, yours included. Each was written alone.",
+    "",
+    dossier,
+    "",
+    "The chair is listening and keeps score. Speak for yourself; do not try to be agreeable.",
+    "1. Attack the one rival nomination that most deserves to lose its place in the final five. Say exactly why it fails this brief: fit, quality, a wrong fact, or that it repeats a stronger film. Taste alone is not an argument.",
+    "2. Defend your hill film, \"" + hill + "\", against the strongest objection anyone could make, including any raised in the pitches above. If another juror's case has changed your mind, defend a different film of yours instead and say so.",
+    "3. Endorse the one rival nomination you would accept in the final five, or none.",
+    "4. Flag any title, year, director or country in the pitches above that you believe is wrong, with the correction. Leave it empty if everything checks out.",
+    "",
+    "The viewer reads this debate word for word: no spoilers (no twists, endings or deaths the film keeps hidden), and say only what you are sure is true of a film.",
+    "",
+    "Reply with only this JSON, no other text:",
+    "{",
+    "  \"line\": \"your sharpest sentence of this round, as you would say it out loud to the room\",",
+    "  \"attack\": {\"title\": \"rival film\", \"juror\": \"their name\", \"argument\": \"two or three sentences\"},",
+    "  \"defend\": {\"title\": \"your film\", \"argument\": \"two or three sentences\"},",
+    "  \"endorse\": {\"title\": \"rival film\", \"juror\": \"their name\", \"reason\": \"one sentence\"},",
+    "  \"factcheck\": \"corrections, or an empty string\"",
+    "}",
+    "Use null for \"endorse\" if you endorse nothing."
+  ].join("\n");
+}
+
+function chairPrompt(b, dossier, transcript){
+  const bench = JURY.map(j => j.seat + ". " + j.name + ", " + j.role + ": " + j.short).join("\n");
+  return [
+    "You are " + CHAIR.name + ", chair of the Midnight Jury. " + CHAIR.bio,
+    "You rule for the viewer, not for the jurors. You have no favourites on this panel and no films of your own.",
+    "", briefBlock(b), "",
+    "THE JURY", bench, "",
+    "ROUND ONE: OPENING PITCHES (each juror worked alone)", dossier, "",
+    "ROUND TWO: CROSS-EXAMINATION",
+    transcript || "This was a short sitting: there was no cross-examination. Weigh the pitches on their own, and check every fact yourself.",
+    "",
+    "YOUR RULING",
+    "Choose exactly five films from the nominations above. Weigh, in this order:",
+    "1. Truth. Strike any film whose title, year, director or country was credibly challenged, or that you cannot confirm exists as described. Correct a small error yourself only when you are certain of the right fact.",
+    "2. Fit. Does the film deliver the mood the viewer described, as a feeling and not only as a genre tag? The jurors read the brief differently: decide which reading is right and rule by it. Respect the intensity the viewer asked for.",
+    "3. Strength of the case. Specific evidence (a scene, a craft choice) beats adjectives. An attack that landed counts against a film; an attack on taste alone does not. A rival's endorsement is strong evidence; a juror praising their own hill film is weak evidence. Two jurors nominating the same film shows it fits the brief, not that it is the best choice: jurors drift toward the same famous titles, so agreement is no proof of quality or of correct facts. Never reward volume or reputation.",
+    "4. The five as a set. Together they should cover the range of the mood, not repeat one film five ways: at most one film per director, at most two titles that most horror fans have already seen, at least two discoveries.",
+    "5. Spread. When two films are equal, prefer the one from a juror who has none in the five yet. Never pick a weaker film for balance alone.",
+    "",
+    "Then put the five in the order this viewer should watch them, as a programmer would build a season, and say why.",
+    "Write for the viewer: plain words, no spoilers. Repeat no juror's claim about a film's premiere, awards, reception or history unless you are certain of it.",
+    "",
+    "Reply with only this JSON, no other text:",
+    "{",
+    "  \"reading\": \"one sentence: the mood, as you rule it should be read\",",
+    "  \"statement\": \"your ruling to the room, three sentences at most\",",
+    "  \"programme\": [",
+    "    {",
+    "      \"title\": \"Film title\",",
+    "      \"year\": 1998,",
+    "      \"director\": \"Full name\",",
+    "      \"country\": \"Country\",",
+    "      \"champions\": [\"the name of every juror who nominated it\"],",
+    "      \"why\": \"two or three sentences: why it made the five, citing the debate where that helps\",",
+    "      \"moment\": \"one spoiler-free scene or detail to look out for\",",
+    "      \"watch_if\": \"a short phrase that completes 'Watch this one if...'\"",
+    "    }",
+    "  ],",
+    "  \"order_note\": \"one sentence: why this viewing order\",",
+    "  \"struck\": [",
+    "    {\"title\": \"a nominated film that lost\", \"juror\": \"who nominated it\", \"reason\": \"one sentence\"}",
+    "  ],",
+    "  \"most_overruled\": \"the name of the juror whose case lost the most\"",
+    "}",
+    "Exactly five films in \"programme\", in viewing order. Up to four notable losers in \"struck\"."
+  ].join("\n");
+}
+
+/* The record as the jurors and the chair read it */
+function dossierText(pitches){
+  return JURY.filter(j => pitches[j.id]).map(j => {
+    const p = pitches[j.id];
+    const lines = ["[" + j.seat + "] " + j.name + ", " + j.role, "Reads the brief as: " + p.reading];
+    p.nominations.forEach((n, i) => {
+      lines.push((i + 1) + ". " + n.title + " (" + (n.year || "year?") + "). Dir. " + (n.director || "?") + ". " + (n.country || "?") + ".");
+      lines.push("   Pitch: " + n.pitch);
+      if (n.moment) lines.push("   Moment: " + n.moment);
+      if (n.risk) lines.push("   Against it: " + n.risk);
+    });
+    lines.push("Hill film: " + p.hill);
+    return lines.join("\n");
+  }).join("\n\n");
+}
+function transcriptText(cross){
+  return JURY.filter(j => cross[j.id]).map(j => {
+    const c = cross[j.id];
+    const lines = ["[" + j.seat + "] " + j.name];
+    if (c.line) lines.push("Says: \"" + c.line + "\"");
+    if (c.attack) lines.push("Attacks " + c.attack.title + (c.attack.juror ? " (" + c.attack.juror + ")" : "") + ": " + c.attack.argument);
+    if (c.defend) lines.push("Defends " + c.defend.title + ": " + c.defend.argument);
+    lines.push(c.endorse ? "Endorses " + c.endorse.title + (c.endorse.juror ? " (" + c.endorse.juror + ")" : "") + ": " + c.endorse.reason : "Endorses nothing.");
+    if (c.factcheck) lines.push("Fact-check: " + c.factcheck);
+    return lines.join("\n");
+  }).join("\n\n");
+}
+
+/* ============================================================
+   SAMPLE VERDICT (prepared in advance, shown until the first hearing)
+   ============================================================ */
+const EXAMPLE = {
+  brief:{ mood:"90s teenage horror", intensity:"any", skip:[], mode:"full" },
+  ruling:{
+    reading:"Not the decade's look but its feeling: being sixteen, watched by adults who don't believe you, while something works its way through your friends.",
+    statement:"The panel split between the knowing slashers and the films about bodies and belonging; the petition covers both, so the five do too. Scream stays because no film explains the decade better, and every other nomination was judged against it. Ginger Snaps lost on the calendar and nothing else.",
+    programme:[
+      { title:"Scream", year:1996, director:"Wes Craven", country:"USA", champions:["Margit Holm"],
+        why:"The film that restarted the cycle and still the best made of it. Holm's case, that Craven stages the opening like a short film of its own, went unanswered all night.",
+        moment:"The first phone call. Watch how the house's windows are used before anything happens.",
+        watch_if:"you want the one all the others are answering" },
+      { title:"The Faculty", year:1998, director:"Robert Rodriguez", country:"USA", champions:["Sam Okafor"],
+        why:"Okafor's pick: written by Scream's screenwriter and directed like a 1950s invasion film dropped into a 1998 high school. Varga's endorsement, that it still plays to a room, sealed it.",
+        moment:"The test in the lab, where everyone has to prove they are still human.",
+        watch_if:"you want the loudest, funniest night of the five" },
+      { title:"Disturbing Behavior", year:1998, director:"David Nutter", country:"USA", champions:["Ines Varga","Yuki Tanabe"],
+        why:"Nominated by two jurors who never compared notes: a small-town school where the star students are a little too perfect. The paranoia is the point, and it lands better than its reputation.",
+        moment:"Any scene with the Blue Ribbons, the school's spotless clique.",
+        watch_if:"you like your peer pressure with teeth" },
+      { title:"The Craft", year:1996, director:"Andrew Fleming", country:"USA", champions:["Dr. Amara Quist"],
+        why:"Quist argued that the decade's teen horror was about who gets power and who gets punished for wanting it, and this is the film that says it out loud. Okafor's attack on its effects landed, but not hard enough.",
+        moment:"The sleepover game: \"light as a feather, stiff as a board.\"",
+        watch_if:"you were ever the new kid" },
+      { title:"Whispering Corridors", year:1998, director:"Park Ki-hyung", country:"South Korea", champions:["Yuki Tanabe"],
+        why:"Tanabe's discovery of the night: a ghost story set in a girls' high school that is really about exam pressure and cruel teachers. A hit at home that started a whole series, and the same decade seen from the other side of the world.",
+        moment:"How the teachers frighten more than anything in the corridors.",
+        watch_if:"you want to end on something quieter and sadder" }
+    ],
+    order_note:"Start with the film the others answer, get louder, then darker, and end abroad, where the same fears look stranger.",
+    struck:[
+      { title:"Ginger Snaps", juror:"Dr. Amara Quist", reason:"The strongest film argued tonight, but it came out in 2000 and the petition asked for the 90s. The closest call of the hearing." },
+      { title:"I Know What You Did Last Summer", juror:"Ines Varga", reason:"Holm's attack held: a copy of Scream without its wit, and Scream is already here." },
+      { title:"Ringu", juror:"Yuki Tanabe", reason:"A landmark, but its teenagers are only the first victims; the film belongs to the adults." },
+      { title:"Idle Hands", juror:"Sam Okafor", reason:"Plays as a comedy first, and the petition asked to be scared." }
+    ],
+    most_overruled:"Dr. Amara Quist"
+  },
+  dissent:{ juror:"scholar", title:"Ginger Snaps", year:2000,
+    text:"The best teenage horror film of its era is about a girl whose body turns on her, and it missed the decade by a few months. Rule on the feeling, not the calendar." }
+};
+
+/* ============================================================
+   SMALL HELPERS
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const str = v => (v == null ? "" : String(v)).trim();
+const yr = v => { const n = parseInt(v, 10); return n > 1880 && n < 2100 ? n : null; };
+const norm = t => str(t).toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/\(\s*\d{4}\s*\)/g, "").replace(/^(the|a|an)\s+/, "").replace(/[^a-z0-9]/g, "");
+const sleep = (ms, signal) => new Promise((res, rej) => {
+  const t = setTimeout(res, ms);
+  if (signal) signal.addEventListener("abort", () => { clearTimeout(t); rej({ code:"cancelled" }); }, { once:true });
+});
+const ROMAN = ["I","II","III","IV","V"];
+const store = {
+  get(k, d){ try { const v = localStorage.getItem("mj." + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem("mj." + k, JSON.stringify(v)); } catch(e){} },
+  del(k){ try { localStorage.removeItem("mj." + k); } catch(e){} }
+};
+function jurorByName(name){
+  const n = str(name).toLowerCase();
+  if (!n) return null;
+  return JURY.find(j => n.includes(j.name.toLowerCase()) || n.includes(j.name.split(" ").pop().toLowerCase())) || null;
+}
+/* Same film: same title, or same year and director (the chair may spell a title differently) */
+function sameFilm(a, b){
+  if (norm(a.title) && norm(a.title) === norm(b.title)) return true;
+  return !!(a.year && b.year && a.year === b.year && norm(a.director) && norm(a.director) === norm(b.director));
+}
+/* Read a reply as one JSON value: the whole reply, a fenced block, or the outermost braces */
+function parseLoose(text){
+  const t = str(text);
+  const tries = [t];
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) tries.push(fence[1]);
+  const a = t.search(/[\[{]/), z = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+  if (a >= 0 && z > a) tries.push(t.slice(a, z + 1));
+  for (const s of tries) { try { return JSON.parse(s); } catch(e){} }
+  return undefined;
+}
+
+/* ============================================================
+   THE ENGINE
+   Inside the hosting app the jury sits on the account's own plan.
+   Anywhere else (the public site) it sits on a key kept on this device.
+   ============================================================ */
+let sample = null, sampleReady = false;
+const samplePromise = (window.claude && typeof window.claude.use === "function")
+  ? window.claude.use("sample").catch(() => null) : Promise.resolve(null);
+samplePromise.then(s => { sample = s; sampleReady = true; renderProjection(); });
+
+const API = "https://api.anthropic.com/v1/messages";
+const STANDARD = {
+  finest:  { juror:"claude-opus-5-5",   chair:"claude-opus-5-5" },
+  thrifty: { juror:"claude-sonnet-5-5", chair:"claude-opus-5-5" }
+};
+/* US dollars per million tokens, from the maker's price list, checked 2026-10-22 */
+const PRICE = { "claude-opus-5-5":[4, 20], "claude-sonnet-5-5":[2, 10] };
+const getKey = () => str(store.get("key", ""));
+function engineKind(){ return sample ? "plan" : (getKey() ? "key" : null); }
+
+async function keyAsk(prompt, tier, signal, withFallback){
+  if (withFallback === undefined) withFallback = true;
+  const std = STANDARD[store.get("quality", "finest")] || STANDARD.finest;
+  const name = tier === "complex" ? std.chair : std.juror;
+  const headers = {
+    "content-type":"application/json",
+    "x-api-key":getKey(),
+    "anthropic-version":"2023-06-01",
+    "anthropic-dangerous-direct-browser-access":"true"
+  };
+  const body = { model:name, max_tokens: tier === "complex" ? 32000 : 16000, output_config:{ effort: tier === "complex" ? "high" : "medium" },
+    messages:[{ role:"user", content:prompt }] };
+  if (withFallback) { headers["anthropic-beta"] = "server-side-fallback-2026-07-01"; body.fallbacks = "default"; }
+  for (let attempt = 0; ; attempt++) {
+    let res;
+    try { res = await fetch(API, { method:"POST", headers, body:JSON.stringify(body), signal }); }
+    catch (e) { if (signal && signal.aborted) throw { code:"cancelled" }; throw { code:"upstream_error" }; }
+    if ((res.status === 429 || res.status === 529) && attempt < 2) {
+      const wait = Math.min(40, Number(res.headers.get("retry-after")) || 12 * (attempt + 1));
+      await sleep(wait * 1000, signal);
+      continue;
+    }
+    let data = null;
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) {
+      const msg = str(data && data.error && data.error.message);
+      if (res.status === 400 && withFallback && /fallback|beta/i.test(msg)) return keyAsk(prompt, tier, signal, false);
+      if (res.status === 401 || res.status === 403) throw { code:"bad_key" };
+      if (res.status === 402 || /credit|billing|balance|payment|usage limit|spend/i.test(msg)) throw { code:"no_credit" };
+      if (res.status === 429) throw { code:"rate_limited" };
+      if (res.status === 400 || res.status === 404 || res.status === 413) throw { code:"invalid_request", message:msg };
+      throw { code:"upstream_error" };
+    }
+    if (run && data && data.usage) {
+      const p = PRICE[data.model] || PRICE[name] || [0, 0];
+      run.spend += ((data.usage.input_tokens || 0) * p[0] + (data.usage.output_tokens || 0) * p[1]) / 1e6;
+    }
+    if (data && data.stop_reason === "refusal") throw { code:"refused" };
+    const text = ((data && data.content) || []).filter(x => x && x.type === "text").map(x => x.text).join("");
+    const v = parseLoose(text);
+    if (v === undefined) throw { code:"invalid_json" };
+    return v;
+  }
+}
+
+const FATAL = {
+  not_granted:"The jury may not sit on this page yet. Allow it in the page's Permissions menu, then summon again.",
+  sampling_disabled:"The jury can't sit for this account.",
+  not_declared:"This page can no longer summon the jury.",
+  capability_disabled:"The jury can't sit in this view. Open the page directly.",
+  capability_removed:"This app is too old to summon the jury. Update it, then try again.",
+  rate_limited:"The jury needs a breather. Wait a minute, then summon again.",
+  session_expired:"Your sign-in ran out. Sign in again, then summon.",
+  queue_overflow:"Too many summons at once. Reload the page and try again.",
+  invalid_request:"The summons was malformed. Something in this page needs fixing.",
+  prompt_too_large:"The record grew too long. Shorten your list of endured films.",
+  transform_error:"The summons was malformed. Something in this page needs fixing.",
+  bad_key:"The projection key was refused. Check it in the projection room.",
+  no_credit:"The projection room is out of credit or has reached its spending limit. Check the key's account, then summon again."
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let run = null;            // the hearing in progress
+const askedThisView = new Set();
+
+function readBrief(){
+  const skip = str($("#skip").value).split(/\n+/).map(str).filter(Boolean).slice(0, 80);
+  return {
+    mood: str($("#mood").value).slice(0, 400),
+    intensity: (document.querySelector("input[name=intensity]:checked") || {}).value || "any",
+    mode: (document.querySelector("input[name=mode]:checked") || {}).value || "full",
+    skip
+  };
+}
+function skipSet(b){ return new Set(b.skip.map(norm)); }
+
+/* ============================================================
+   RENDER: petition, roll call, cost line
+   ============================================================ */
+function renderWhisper(){
+  $("#whisper").innerHTML = "or whisper " + MOODS.map(m => '<button type="button">' + esc(m) + '</button>').join('<span class="dot">·</span>');
+  $("#whisper").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $("#mood").value = b.textContent; store.set("mood", b.textContent); $("#mood").focus(); showSummons();
+  });
+}
+function renderSeats(){
+  const seat = (j, chair) =>
+    '<li class="' + (chair ? "presiding" : "") + '"><span class="rn">' + esc(chair ? "Chair" : j.seat) + '</span>' +
+    '<span class="who"><span class="nm">' + esc(j.name) + '</span><span class="rl">' + esc(j.role) + '</span><span class="ts">' + esc(j.short) + '</span></span>' +
+    '<span class="vigil" id="lamp-' + j.id + '" data-s="idle"><span class="candle" aria-hidden="true"></span><span class="st">Silent</span></span></li>';
+  $("#seats").innerHTML = JURY.map(j => seat(j, false)).join("") + seat(CHAIR, true);
+}
+const LAMP_TEXT = { idle:"Silent", thinking:"Deliberating", done:"Has spoken", absent:"Absent" };
+function lamp(id, s, text){
+  const el = $("#lamp-" + id); if (!el) return;
+  el.dataset.s = s;
+  el.querySelector(".st").textContent = text || LAMP_TEXT[s] || "";
+}
+function updateCost(){
+  const b = readBrief();
+  $("#cost").textContent = b.mode === "full"
+    ? "A full hearing: fifteen nominations, a cross-examination, one verdict. Several minutes; keep this page open."
+    : "A swift hearing: fifteen nominations and a verdict, no cross-examination. A few minutes; keep this page open.";
+}
+function updateSkipCount(){
+  const n = readBrief().skip.length;
+  $("#skipCount").textContent = n ? "(" + n + ")" : "";
+}
+
+/* ============================================================
+   RENDER: the proceedings
+   ============================================================ */
+function dossierHTML(j, p, dropped){
+  const hill = norm(p.hill);
+  const noms = p.nominations.map(n => {
+    const isHill = norm(n.title) === hill;
+    return '<div class="nom' + (isHill ? " hill" : "") + '">' +
+      (isHill ? '<span class="hill-mark">hill to die on</span>' : "") +
+      '<span class="t">' + esc(n.title) + '</span>' +
+      '<span class="meta">' + esc([n.year, n.director, n.country].filter(Boolean).join(" · ")) + '</span>' +
+      '<p class="pitch">' + esc(n.pitch) + '</p>' +
+      (n.moment ? '<p class="kv"><b>The moment</b>' + esc(n.moment) + '</p>' : "") +
+      (n.risk ? '<p class="kv"><b>Against it</b>' + esc(n.risk) + '</p>' : "") +
+      '</div>';
+  }).join("");
+  return '<div class="t-head"><span class="sn">' + esc(j.seat) + '</span><span class="who">' + esc(j.name) + '</span><span class="what">' + esc(j.role) + '</span></div>' +
+    (p.reading ? '<p class="reading">' + esc(p.reading) + '</p>' : "") +
+    '<div class="noms">' + noms + '</div>' +
+    (dropped ? '<p class="dropped">' + dropped + (dropped === 1 ? " nomination" : " nominations") + ' left out: already endured.</p>' : "");
+}
+function renderPitchSlots(){
+  $("#pitches").innerHTML = JURY.map(j =>
+    '<article class="testimony" id="dos-' + j.id + '"><p class="pending">' + esc(j.name) + ' is choosing three films…</p></article>').join("");
+}
+function renderPitch(j, p, dropped){
+  const el = $("#dos-" + j.id); if (!el) return;
+  el.innerHTML = dossierHTML(j, p, dropped);
+}
+function renderAbsent(j){
+  const el = $("#dos-" + j.id);
+  if (el) el.outerHTML = '<p class="absent-note" id="dos-' + j.id + '">' + esc(j.name) + ' did not appear this round.</p>';
+}
+function turnHTML(j, c){
+  const mv = (label, html) => html ? '<p class="move"><b>' + label + '</b>' + html + '</p>' : "";
+  const tag = (t, who) => '<em>' + esc(t) + '</em>' + (who ? ' (' + esc(who) + ')' : "");
+  return '<div class="turn"><p class="spk">' + esc(j.name.replace(/^Dr\. /, "")) + '<small>' + esc(j.role) + '</small></p>' +
+    (c.line ? '<p class="line">“' + esc(c.line) + '”</p>' : "") +
+    (c.attack ? mv("Attacks", tag(c.attack.title, c.attack.juror) + ": " + esc(c.attack.argument)) : "") +
+    (c.defend ? mv("Defends", tag(c.defend.title) + ": " + esc(c.defend.argument)) : "") +
+    mv("Concedes", c.endorse ? tag(c.endorse.title, c.endorse.juror) + ": " + esc(c.endorse.reason) : "nothing.") +
+    (c.factcheck ? mv("Corrects", esc(c.factcheck)) : "") +
+    '</div>';
+}
+function renderCross(cross, waiting){
+  const parts = JURY.map(j => {
+    if (cross[j.id]) return turnHTML(j, cross[j.id]);
+    if (waiting && waiting.has(j.id)) return '<div class="turn"><p class="spk">' + esc(j.name.replace(/^Dr\. /, "")) + '</p><p class="pending">Reading the other testimony…</p></div>';
+    return "";
+  }).join("");
+  $("#cross").innerHTML = parts ? '<div class="transcript">' + parts + '</div>' : "";
+}
+function renderChair(r, pending){
+  $("#chairBox").innerHTML = pending
+    ? '<div class="chair-says"><p class="eyebrow">' + esc(CHAIR.name) + '</p><p>The chair is weighing the record…</p></div>'
+    : (r ? '<div class="chair-says"><p class="eyebrow">' + esc(CHAIR.name) + ' reads the petition as</p><p>' + esc(r.reading) + '</p></div>' : "");
+}
+
+/* ============================================================
+   RENDER: the verdict
+   ============================================================ */
+function cardHTML(f, i, seen, pitches){
+  /* Credit comes from the record when there is one; the chair's list is the fallback */
+  let champs = pitches ? JURY.filter(j => pitches[j.id] && pitches[j.id].nominations.some(n => sameFilm(n, f))).map(j => j.name + ", " + j.role) : [];
+  if (!champs.length) champs = (f.champions || []).map(n => { const j = jurorByName(n); return j ? j.name + ", " + j.role : str(n); }).filter(Boolean);
+  const isSeen = seen.has(norm(f.title));
+  const q = encodeURIComponent(str(f.title));
+  const credit = [f.director ? 'A film by <b>' + esc(f.director) + '</b>' : "", esc(f.year || ""), esc(f.country || "")].filter(Boolean).join(" · ");
+  return '<li class="card"><div class="frame">' +
+    '<span class="num">' + (ROMAN[i] || i + 1) + '</span>' +
+    '<h3 class="ttl">' + esc(f.title) + '</h3>' +
+    '<p class="credit">' + credit + '</p>' +
+    (champs.length ? '<p class="champ">championed by ' + esc(champs.join(" & ")) + '</p>' : "") +
+    '<p class="why">' + esc(f.why) + '</p>' +
+    '<dl class="notes">' +
+      (f.moment ? '<div><dt>Watch for</dt><dd>' + esc(f.moment) + '</dd></div>' : "") +
+      (f.watch_if ? '<div><dt>Watch this one if</dt><dd>' + esc(f.watch_if) + '</dd></div>' : "") +
+    '</dl>' +
+    '<p class="links">' +
+      '<a href="https://letterboxd.com/search/films/' + q + '/" target="_blank" rel="noopener">Letterboxd ↗</a>' +
+      '<a href="https://www.justwatch.com/nl/search?q=' + q + '" target="_blank" rel="noopener">Where to watch ↗</a>' +
+      '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(str(f.title) + " " + (f.year || "") + " trailer") + '" target="_blank" rel="noopener">Trailer ↗</a>' +
+      '<button class="seen-btn" type="button" aria-pressed="' + isSeen + '" data-film="' + esc(str(f.title) + (f.year ? " (" + f.year + ")" : "")) + '">' + (isSeen ? "Seen ✓" : "Seen it") + '</button>' +
+    '</p></div></li>';
+}
+function renderProgramme(entry, opts){
+  opts = opts || {};
+  const r = entry.ruling;
+  const seen = skipSet(readBrief());
+  $("#exampleFlag").hidden = !opts.example;
+  $("#progMood").textContent = entry.brief.mood;
+  $("#statement").textContent = r.statement || "";
+  $("#statement").hidden = !r.statement;
+  $("#programme").innerHTML = r.programme.map((f, i) => cardHTML(f, i, seen, entry.pitches)).join("");
+  $("#orderNote").textContent = r.order_note ? "Why this order: " + r.order_note : "";
+  const struck = (r.struck || []).filter(s => s && s.title);
+  $("#struckBox").hidden = !struck.length;
+  $("#struck").innerHTML = struck.map(s => {
+    const j = jurorByName(s.juror);
+    return '<li><span class="st">' + esc(s.title) + '</span><span class="by">' + esc(j ? j.name + ", " + j.role : str(s.juror)) + '</span><span class="rs">' + esc(s.reason) + '</span></li>';
+  }).join("");
+  const d = opts.example ? exampleDissent() : dissentFor(entry);
+  $("#dissentBox").hidden = !d;
+  $("#dissent").innerHTML = d || "";
+  const stamp = $("#stamp");
+  stamp.classList.remove("slam");
+  if (opts.slam) { void stamp.offsetWidth; stamp.classList.add("slam"); }
+}
+function dissentHTML(j, title, year, text, note){
+  return '<div class="dissent"><span class="who">' + esc(j.name) + ', ' + esc(j.role) + ', still stands by</span>' +
+    '<span class="film">' + esc(title) + (year ? " (" + esc(year) + ")" : "") + '</span>' +
+    '<blockquote>“' + esc(text) + '”</blockquote>' +
+    '<span class="src">' + esc(note) + '</span></div>';
+}
+function exampleDissent(){
+  const d = EXAMPLE.dissent, j = JURY.find(x => x.id === d.juror);
+  return dissentHTML(j, d.title, d.year, d.text, "Sample text, prepared in advance.");
+}
+function dissentFor(entry){
+  const j = jurorByName(entry.ruling.most_overruled);
+  const p = j && entry.pitches && entry.pitches[j.id];
+  if (!p) return "";
+  const lost = p.nominations.filter(n => !entry.ruling.programme.some(f => sameFilm(n, f)));
+  if (!lost.length) return "";
+  const pick = lost.find(n => norm(n.title) === norm(p.hill)) || lost[0];
+  return dissentHTML(j, pick.title, pick.year, pick.pitch, "In the juror's own words, from the sealed testimony.");
+}
+
+/* ============================================================
+   PAST VERDICTS
+   ============================================================ */
+function renderArchive(){
+  const list = store.get("rulings", []);
+  $("#docketNo").textContent = "No. " + String(list.length + 1).padStart(3, "0");
+  if (!list.length) { $("#archive").innerHTML = '<li class="empty">Your verdicts will be kept here, on this device only.</li>'; return; }
+  $("#archive").innerHTML = list.map((e, i) =>
+    '<li><button type="button" data-i="' + i + '"><span class="am">“' + esc(e.brief.mood) + '”</span>' +
+    '<span class="ad">' + esc(new Date(e.date).toLocaleDateString(undefined, {day:"numeric", month:"short", year:"numeric"})) + ' · ' +
+    esc(e.ruling.programme.map(f => f.title).join(" · ")) + '</span></button></li>').join("");
+}
+function saveRuling(entry){
+  const list = store.get("rulings", []);
+  list.unshift(entry);
+  store.set("rulings", list.slice(0, 12));
+  renderArchive();
+}
+function showPast(entry){
+  renderProgramme(entry, {});
+  if (entry.pitches) {
+    $("#record").hidden = false;
+    $("#recordFor").textContent = "The proceedings for “" + entry.brief.mood + "”";
+    renderPitchSlots();
+    JURY.forEach(j => { if (entry.pitches[j.id]) renderPitch(j, entry.pitches[j.id], 0); else renderAbsent(j); });
+    $("#r2").hidden = !entry.cross || !Object.keys(entry.cross).length;
+    renderCross(entry.cross || {}, null);
+    renderChair(entry.ruling, false);
+  }
+  $("#programmeSec").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* ============================================================
+   THE HEARING
+   ============================================================ */
+function setStatus(t){ $("#status").textContent = t || ""; }
+/* A few summons at once: the hosts let only a couple run at a time and refuse a flood */
+async function inTurns(list, fn, n){
+  const q = list.slice();
+  await Promise.all(Array.from({ length: n || 2 }, async () => { while (q.length) await fn(q.shift()); }));
+}
+function setRunning(on){
+  $("#convene").disabled = on;
+  $("#convene").innerHTML = on ? "<b>In session</b><small>please wait</small>" : "<b>Summon</b><small>the jury</small>";
+  $("#stop").hidden = !on;
+}
+/* On a key, a repeat of the same brief after a failed hearing reuses the jurors' paid answers */
+const keyMemo = new Map();
+function ask(prompt, tier){
+  const ctl = new AbortController();
+  run.ctls.push(ctl);
+  if (run.engine === "key") {
+    const k = tier + "|" + store.get("quality", "finest") + "|" + prompt;
+    if (tier !== "complex" && !run.fresh && keyMemo.has(k)) return Promise.resolve(keyMemo.get(k));
+    return keyAsk(prompt, tier, ctl.signal).then(v => { if (tier !== "complex") keyMemo.set(k, v); return v; });
+  }
+  const opts = { modelTier: tier, signal: ctl.signal };
+  if (run.fresh || tier === "complex") opts.cache = false;
+  return sample.json(prompt, opts);
+}
+function fatal(e){
+  if (!run || run.over) return;
+  run.over = true;
+  run.ctls.forEach(c => c.abort());
+  setStatus(FATAL[e.code] || "The jury couldn't be reached. Try again in a minute.");
+  if (e.code === "bad_key" || e.code === "no_credit") openProjection();
+}
+function cleanPitch(p, skips){
+  if (!p || !Array.isArray(p.nominations)) return null;
+  let dropped = 0;
+  const noms = p.nominations.filter(n => n && str(n.title)).map(n => ({
+    title:str(n.title), year:yr(n.year), director:str(n.director), country:str(n.country),
+    pitch:str(n.pitch), moment:str(n.moment), risk:str(n.risk)
+  })).filter(n => { if (skips.has(norm(n.title))) { dropped++; return false; } return true; }).slice(0, 3);
+  if (!noms.length) return null;
+  return { reading:str(p.reading), nominations:noms, hill:str(p.hill) || noms[0].title, dropped };
+}
+function cleanCross(c){
+  if (!c || typeof c !== "object") return null;
+  const o = x => (x && typeof x === "object" && str(x.title)) ? x : null;
+  const a = o(c.attack), d = o(c.defend), e = o(c.endorse);
+  return {
+    line:str(c.line),
+    attack: a ? { title:str(a.title), juror:str(a.juror), argument:str(a.argument) } : null,
+    defend: d ? { title:str(d.title), argument:str(d.argument) } : null,
+    endorse: e ? { title:str(e.title), juror:str(e.juror), reason:str(e.reason) } : null,
+    factcheck:str(c.factcheck)
+  };
+}
+function cleanRuling(r){
+  if (!r || !Array.isArray(r.programme)) return null;
+  const programme = r.programme.filter(f => f && str(f.title)).slice(0, 5).map(f => ({
+    title:str(f.title), year:yr(f.year), director:str(f.director), country:str(f.country),
+    champions:Array.isArray(f.champions) ? f.champions.map(str).filter(Boolean) : (f.champions ? [str(f.champions)] : []),
+    why:str(f.why), moment:str(f.moment), watch_if:str(f.watch_if).replace(/^watch this( one)? if\s*/i, "")
+  }));
+  if (programme.length < 3) return null;
+  return {
+    reading:str(r.reading), statement:str(r.statement), programme, order_note:str(r.order_note),
+    struck:Array.isArray(r.struck) ? r.struck.slice(0, 4).map(s => ({ title:str(s && s.title), juror:str(s && s.juror), reason:str(s && s.reason) })) : [],
+    most_overruled:str(r.most_overruled)
+  };
+}
+
+async function convene(){
+  const b = readBrief();
+  if (!b.mood) { setStatus("Tell the jury what you crave first."); $("#mood").focus(); return; }
+  if (!sampleReady) { setStatus("Lighting the candles…"); await samplePromise; setStatus(""); }
+  const kind = engineKind();
+  if (!kind) { setStatus("The jury sits only for the house. The sample verdict below is open to all."); openProjection(); return; }
+
+  const key = JSON.stringify([b.mood.toLowerCase(), b.intensity, b.mode, b.skip]);
+  run = { brief:b, pitches:{}, cross:{}, ctls:[], over:false, fresh: askedThisView.has(key), engine:kind, spend:0 };
+  const me = run;
+  const skips = skipSet(b);
+  const width = kind === "key" ? 3 : 2;
+
+  setRunning(true);
+  setStatus("");
+  $("#record").hidden = false;
+  $("#recordFor").textContent = "The proceedings for “" + b.mood + "”";
+  $("#r2").hidden = b.mode !== "full";
+  renderPitchSlots();
+  $("#cross").innerHTML = "";
+  $("#chairBox").innerHTML = "";
+  JURY.forEach(j => lamp(j.id, "idle", "Waiting"));
+  lamp("chair", "idle");
+  $("#record").scrollIntoView({behavior:"smooth", block:"start"});
+
+  try {
+    /* I: five sealed testimonies */
+    await inTurns(JURY, j => {
+      if (me.over) return;
+      lamp(j.id, "thinking");
+      return ask(pitchPrompt(j, b), "default")
+        .then(res => {
+          if (me.over) return;
+          const p = cleanPitch(res, skips);
+          if (!p) throw { code:"invalid_json" };
+          me.pitches[j.id] = p; renderPitch(j, p, p.dropped); lamp(j.id, "done", "Has testified");
+        })
+        .catch(e => {
+          if (me.over) return;
+          if (e && FATAL[e.code]) return fatal(e);
+          if (e && e.code === "cancelled") return;
+          renderAbsent(j); lamp(j.id, "absent");
+        });
+    }, width);
+    if (me.over) return;
+    const present = JURY.filter(j => me.pitches[j.id]);
+    if (present.length < 3) { setStatus("Only " + present.length + " jurors appeared, too few for a fair verdict. Summon again in a minute."); return; }
+    const dossier = dossierText(me.pitches);
+
+    /* II: cross-examination, each juror alone again */
+    let transcript = "";
+    if (b.mode === "full") {
+      const waiting = new Set(present.map(j => j.id));
+      present.forEach(j => lamp(j.id, "idle", "Waiting"));
+      renderCross(me.cross, waiting);
+      await inTurns(present, j => {
+        if (me.over) return;
+        lamp(j.id, "thinking", "Reading the others");
+        return ask(crossPrompt(j, b, dossier, me.pitches[j.id].hill), "default")
+          .then(res => {
+            if (me.over) return;
+            const c = cleanCross(res);
+            if (!c) throw { code:"invalid_json" };
+            me.cross[j.id] = c; waiting.delete(j.id); renderCross(me.cross, waiting); lamp(j.id, "done", "Has argued");
+          })
+          .catch(e => {
+            if (me.over) return;
+            if (e && FATAL[e.code]) return fatal(e);
+            if (e && e.code === "cancelled") return;
+            waiting.delete(j.id); renderCross(me.cross, waiting); lamp(j.id, "absent", "Held silence");
+          });
+      }, width);
+      if (me.over) return;
+      transcript = transcriptText(me.cross);
+    }
+
+    /* III: the chair rules */
+    lamp("chair", "thinking", "Weighing the record");
+    renderChair(null, true);
+    let ruling = null;
+    try {
+      ruling = cleanRuling(await ask(chairPrompt(b, dossier, transcript), "complex"));
+    } catch (e) {
+      if (me.over) return;
+      if (e && FATAL[e.code]) return fatal(e);
+      if (e && e.code === "cancelled") return;
+      ruling = null;
+    }
+    if (me.over) return;
+    if (!ruling) { lamp("chair", "absent"); renderChair(null, false); setStatus("The chair couldn't reach a verdict this time. The testimony above still stands; summon again for a verdict."); return; }
+    lamp("chair", "done", "Has ruled");
+    renderChair(ruling, false);
+    const entry = { date:new Date().toISOString(), brief:b, pitches:me.pitches, cross:me.cross, ruling };
+    saveRuling(entry);
+    askedThisView.add(key);
+    renderProgramme(entry, { slam:true });
+    $("#programmeSec").scrollIntoView({behavior:"smooth", block:"start"});
+  } finally {
+    if (me.engine === "key" && me.spend > 0) {
+      store.set("lastCost", { usd:me.spend, mode:b.mode, date:new Date().toISOString() }); renderProjection();
+      const s = $("#status").textContent;
+      setStatus((s ? s + " " : "") + "This sitting cost about $" + me.spend.toFixed(2) + " on your key.");
+    }
+    if (run === me) { setRunning(false); run = null; }
+  }
+}
+function stop(){
+  if (!run) return;
+  run.over = true;
+  run.ctls.forEach(c => c.abort());
+  JURY.concat([CHAIR]).forEach(j => { const el = $("#lamp-" + j.id); if (el && (el.dataset.s === "thinking" || el.querySelector(".st").textContent === "Waiting")) lamp(j.id, "idle", "Adjourned"); });
+  setStatus("Adjourned. What the jury said so far stays on the record.");
+}
+
+/* ============================================================
+   THE PROJECTION ROOM (only needed off the hosting app)
+   ============================================================ */
+function openProjection(){
+  $("#projection").hidden = false;
+  renderProjection();
+  $("#projection").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function renderProjection(){
+  const kind = engineKind();
+  $("#summonsWrap").hidden = kind !== "plan";
+  $("#keyArea").hidden = kind === "plan";
+  $("#projState").textContent = kind === "plan" ? "This page runs on your account's own plan. Nothing to set here."
+    : kind === "key" ? "A key is set on this device." : "No key on this device yet.";
+  const r = document.getElementById("q-" + store.get("quality", "finest")); if (r) r.checked = true;
+  const last = store.get("lastCost", null);
+  $("#lastCost").textContent = last ? "Last hearing (" + (last.mode === "full" ? "full" : "swift") + "): about $" + Number(last.usd).toFixed(2) + "." : "";
+}
+async function saveKey(){
+  const k = str($("#keyInput").value);
+  const msg = $("#projMsg");
+  if (!k) { msg.textContent = "Paste the key first."; return; }
+  msg.textContent = "Testing the key…";
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/models?limit=1", { headers:{ "x-api-key":k, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" } });
+    if (res.status === 401 || res.status === 403) { msg.textContent = "That key was refused. Nothing was saved."; return; }
+    store.set("key", k);
+    $("#keyInput").value = "";
+    msg.textContent = res.ok ? "Key accepted and kept on this device." : "Key kept, but it could not be tested just now.";
+  } catch (e) {
+    store.set("key", k);
+    $("#keyInput").value = "";
+    msg.textContent = "Key kept, but it could not be tested just now.";
+  }
+  renderProjection();
+}
+function forgetKey(){
+  store.del("key");
+  $("#projMsg").textContent = "The key is gone from this device.";
+  renderProjection();
+}
+
+/* ============================================================
+   THE SUMMONS VIEWER
+   ============================================================ */
+function summonsOptions(){
+  const opts = JURY.map(j => ({ v:"p-" + j.id, t:j.name + " · sealed testimony" }));
+  opts.push({ v:"x", t:"Any juror · cross-examination" });
+  opts.push({ v:"c", t:CHAIR.name + " · the verdict" });
+  $("#summonsPick").innerHTML = opts.map(o => '<option value="' + o.v + '">' + esc(o.t) + '</option>').join("");
+}
+function showSummons(){
+  const v = $("#summonsPick").value;
+  const live = readBrief();
+  const b = live.mood ? live : Object.assign({}, live, { mood:"90s teenage horror" });
+  let t;
+  if (v === "x") t = crossPrompt(JURY[0], b, "[ all five sealed testimonies go here ]", "[ this juror's hill film ]");
+  else if (v === "c") t = chairPrompt(b, "[ all five sealed testimonies go here ]", b.mode === "full" ? "[ the cross-examination goes here ]" : "");
+  else t = pitchPrompt(JURY.find(j => "p-" + j.id === v), b);
+  $("#summonsText").textContent = t;
+}
+function selectSummons(){
+  const r = document.createRange(); r.selectNodeContents($("#summonsText"));
+  const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+function init(){
+  renderWhisper();
+  renderSeats();
+  summonsOptions();
+
+  $("#mood").value = store.get("mood", "");
+  $("#skip").value = store.get("skip", "");
+  const prefs = store.get("prefs", {});
+  if (prefs.intensity) { const r = document.getElementById("int-" + prefs.intensity); if (r) r.checked = true; }
+  if (prefs.mode) { const r = document.getElementById("mode-" + prefs.mode); if (r) r.checked = true; }
+
+  $("#mood").addEventListener("input", () => { store.set("mood", $("#mood").value); });
+  $("#mood").addEventListener("change", showSummons);
+  $("#mood").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!run) convene(); } });
+  $("#skip").addEventListener("input", () => { store.set("skip", $("#skip").value); updateSkipCount(); });
+  document.querySelectorAll("input[name=intensity],input[name=mode]").forEach(r => r.addEventListener("change", () => {
+    const b = readBrief(); store.set("prefs", { intensity:b.intensity, mode:b.mode }); updateCost(); showSummons();
+  }));
+  document.querySelectorAll("input[name=quality]").forEach(r => r.addEventListener("change", () => { store.set("quality", r.value); }));
+  $("#convene").addEventListener("click", () => { if (!run) convene(); });
+  $("#stop").addEventListener("click", stop);
+  $("#openProjection").addEventListener("click", () => { const p = $("#projection"); if (p.hidden) openProjection(); else p.hidden = true; });
+  $("#saveKey").addEventListener("click", saveKey);
+  $("#forgetKey").addEventListener("click", forgetKey);
+
+  $("#programme").addEventListener("click", e => {
+    const btn = e.target.closest(".seen-btn"); if (!btn) return;
+    const film = btn.dataset.film, k = norm(film);
+    let lines = str($("#skip").value).split(/\n+/).map(str).filter(Boolean);
+    const has = lines.some(l => norm(l) === k);
+    lines = has ? lines.filter(l => norm(l) !== k) : lines.concat(film);
+    $("#skip").value = lines.join("\n");
+    store.set("skip", $("#skip").value);
+    updateSkipCount();
+    btn.setAttribute("aria-pressed", String(!has));
+    btn.textContent = has ? "Seen it" : "Seen ✓";
+  });
+  $("#archive").addEventListener("click", e => {
+    const btn = e.target.closest("button[data-i]"); if (!btn) return;
+    const entry = store.get("rulings", [])[+btn.dataset.i];
+    if (entry) showPast(entry);
+  });
+  $("#summonsPick").addEventListener("change", showSummons);
+  $("#copySummons").addEventListener("click", () => {
+    const t = $("#summonsText").textContent, btn = $("#copySummons");
+    const done = ok => { btn.textContent = ok ? "Copied" : "Select and copy"; setTimeout(() => { btn.textContent = "Copy"; }, 1800); };
+    try { navigator.clipboard.writeText(t).then(() => done(true), () => { selectSummons(); done(false); }); }
+    catch (err) { selectSummons(); done(false); }
+  });
+
+  updateSkipCount();
+  updateCost();
+  showSummons();
+  renderArchive();
+  renderProjection();
+
+  const last = store.get("rulings", [])[0];
+  if (last) renderProgramme(last, {});
+  else renderProgramme(EXAMPLE, { example:true });
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
+
+<script>
+/* Install as an app: work offline once opened, and pick up a newer version when it comes back to the front. */
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  navigator.serviceWorker.register("sw.js").then(reg => {
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") reg.update().catch(() => {}); });
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
