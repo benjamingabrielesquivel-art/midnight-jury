@@ -420,14 +420,14 @@ footer .ghost{align-self:start}
     <h2 id="projH">The projection room</h2>
     <p class="proj-state" id="projState"></p>
     <div id="keyArea">
-      <p>Paste your key once. It stays in this browser, on this device, and goes only to the service that runs the hearings. Each hearing is billed to the key's own account, separately from any subscription. Set a monthly spending limit in that account, and delete the key there if this device is lost. Anyone using this browser can run hearings on it, and so can any other page published at this same web address.</p>
+      <p>Paste your key once. It stays in this browser, on this device, and goes only to the service that runs the hearings. Hearings count against that key's own account: a free key has a daily allowance, a paid key is billed, separately from any subscription. Delete the key in its account if this device is lost. Anyone using this browser can run hearings on it, and so can any other page published at this same web address.</p>
       <div class="key-row">
         <label class="eyebrow" for="keyInput">Projection key</label>
         <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="Paste the key here">
         <button class="ghost" type="button" id="saveKey">Set key</button>
         <button class="ghost" type="button" id="forgetKey">Forget key</button>
       </div>
-      <fieldset>
+      <fieldset id="qualityBox">
         <legend>The jurors' standard</legend>
         <div class="words">
           <label><input type="radio" name="quality" id="q-finest" value="finest" checked><span>finest</span></label>
@@ -768,6 +768,38 @@ const STANDARD = {
 const PRICE = { "claude-opus-5-5":[4, 20], "claude-sonnet-5-5":[2, 10] };
 const getKey = () => str(store.get("key", ""));
 function engineKind(){ return sample ? "plan" : (getKey() ? "key" : null); }
+/* Two kinds of key: a free one from Google (starts "AIza") or a paid one from Anthropic */
+const keyKind = k => /^AIza/.test(str(k)) ? "google" : "anthropic";
+const GOOGLE_MODEL = "gemini-3.8-flash";   /* on the free tier per Google's price list, checked 2026-10-22 */
+
+async function googleAsk(prompt, tier, signal){
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GOOGLE_MODEL + ":generateContent";
+  const body = { contents:[{ role:"user", parts:[{ text:prompt }] }],
+    generationConfig:{ responseMimeType:"application/json", maxOutputTokens: tier === "complex" ? 32768 : 16384 } };
+  for (let attempt = 0; ; attempt++) {
+    let res;
+    try { res = await fetch(url, { method:"POST", headers:{ "content-type":"application/json", "x-goog-api-key":getKey() }, body:JSON.stringify(body), signal }); }
+    catch (e) { if (signal && signal.aborted) throw { code:"cancelled" }; throw { code:"upstream_error" }; }
+    let data = null;
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) {
+      const msg = str(data && data.error && data.error.message);
+      if (res.status === 429 && /per ?day|perday/i.test(msg)) throw { code:"daily_limit" };
+      if ((res.status === 429 || res.status === 503) && attempt < 2) { await sleep(20000 * (attempt + 1), signal); continue; }
+      if (res.status === 429) throw { code:"rate_limited" };
+      if (/api key|permission|forbidden/i.test(msg) || res.status === 401 || res.status === 403) throw { code:"bad_key" };
+      if (res.status === 400 || res.status === 404) throw { code:"invalid_request", message:msg };
+      throw { code:"upstream_error" };
+    }
+    if (data && data.promptFeedback && data.promptFeedback.blockReason) throw { code:"refused" };
+    const cand = data && data.candidates && data.candidates[0];
+    if (!cand || cand.finishReason === "SAFETY") throw { code:"refused" };
+    const text = ((cand.content && cand.content.parts) || []).filter(p => p && p.text && !p.thought).map(p => p.text).join("");
+    const v = parseLoose(text);
+    if (v === undefined) throw { code:"invalid_json" };
+    return v;
+  }
+}
 
 async function keyAsk(prompt, tier, signal, withFallback){
   if (withFallback === undefined) withFallback = true;
@@ -827,7 +859,8 @@ const FATAL = {
   prompt_too_large:"The record grew too long. Shorten your list of endured films.",
   transform_error:"The summons was malformed. Something in this page needs fixing.",
   bad_key:"The projection key was refused. Check it in the projection room.",
-  no_credit:"The projection room is out of credit or has reached its spending limit. Check the key's account, then summon again."
+  no_credit:"The projection room is out of credit or has reached its spending limit. Check the key's account, then summon again.",
+  daily_limit:"The jury has used up today's free sittings on this key. Come back tomorrow, or try a swift hearing."
 };
 
 /* ============================================================
@@ -1061,9 +1094,11 @@ function ask(prompt, tier){
   const ctl = new AbortController();
   run.ctls.push(ctl);
   if (run.engine === "key") {
-    const k = tier + "|" + store.get("quality", "finest") + "|" + prompt;
+    const kind = keyKind(getKey());
+    const k = kind + "|" + tier + "|" + store.get("quality", "finest") + "|" + prompt;
     if (tier !== "complex" && !run.fresh && keyMemo.has(k)) return Promise.resolve(keyMemo.get(k));
-    return keyAsk(prompt, tier, ctl.signal).then(v => { if (tier !== "complex") keyMemo.set(k, v); return v; });
+    const call = kind === "google" ? googleAsk(prompt, tier, ctl.signal) : keyAsk(prompt, tier, ctl.signal);
+    return call.then(v => { if (tier !== "complex") keyMemo.set(k, v); return v; });
   }
   const opts = { modelTier: tier, signal: ctl.signal };
   if (run.fresh || tier === "complex") opts.cache = false;
@@ -1124,7 +1159,7 @@ async function convene(){
   run = { brief:b, pitches:{}, cross:{}, ctls:[], over:false, fresh: askedThisView.has(key), engine:kind, spend:0 };
   const me = run;
   const skips = skipSet(b);
-  const width = kind === "key" ? 3 : 2;
+  const width = kind === "key" && keyKind(getKey()) === "anthropic" ? 3 : 2;
 
   setRunning(true);
   setStatus("");
@@ -1240,7 +1275,8 @@ function renderProjection(){
   $("#summonsWrap").hidden = kind !== "plan";
   $("#keyArea").hidden = kind === "plan";
   $("#projState").textContent = kind === "plan" ? "This page runs on your account's own plan. Nothing to set here."
-    : kind === "key" ? "A key is set on this device." : "No key on this device yet.";
+    : kind === "key" ? (keyKind(getKey()) === "google" ? "A free key is set on this device." : "A paid key is set on this device.") : "No key on this device yet.";
+  $("#qualityBox").hidden = kind === "key" && keyKind(getKey()) === "google";
   const r = document.getElementById("q-" + store.get("quality", "finest")); if (r) r.checked = true;
   const last = store.get("lastCost", null);
   $("#lastCost").textContent = last ? "Last hearing (" + (last.mode === "full" ? "full" : "swift") + "): about $" + Number(last.usd).toFixed(2) + "." : "";
@@ -1251,8 +1287,10 @@ async function saveKey(){
   if (!k) { msg.textContent = "Paste the key first."; return; }
   msg.textContent = "Testing the key…";
   try {
-    const res = await fetch("https://api.anthropic.com/v1/models?limit=1", { headers:{ "x-api-key":k, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" } });
-    if (res.status === 401 || res.status === 403) { msg.textContent = "That key was refused. Nothing was saved."; return; }
+    const res = keyKind(k) === "google"
+      ? await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1", { headers:{ "x-goog-api-key":k } })
+      : await fetch("https://api.anthropic.com/v1/models?limit=1", { headers:{ "x-api-key":k, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" } });
+    if (res.status === 400 || res.status === 401 || res.status === 403) { msg.textContent = "That key was refused. Nothing was saved."; return; }
     store.set("key", k);
     $("#keyInput").value = "";
     msg.textContent = res.ok ? "Key accepted and kept on this device." : "Key kept, but it could not be tested just now.";
