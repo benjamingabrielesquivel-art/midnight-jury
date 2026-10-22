@@ -1,5 +1,5 @@
 // Midnight Jury: keeps the page usable offline. Hearings themselves need a connection.
-const CACHE = "midnight-jury-v1";
+const CACHE = "midnight-jury-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
